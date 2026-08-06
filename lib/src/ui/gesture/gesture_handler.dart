@@ -398,7 +398,7 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
     _lastDragPosition = details.localPosition;
     if (_applicationOwnsPointerDrag) return;
     _updateDragSelection();
-    _startSelectionAutoScroll(details.localPosition);
+    _startSelectionAutoScroll(details.globalPosition);
   }
 
   void onDragEnd(DragEndDetails details) {
