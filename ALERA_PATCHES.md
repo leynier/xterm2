@@ -1,6 +1,6 @@
 # Alera compatibility audit
 
-The upstream base is SoFluffyOS/xterm2 `2a339558ba103e38a304a4eda7c984b45c47e186` (5.3.0). `next` is this fork's default and only permanent remote branch. Preserve tags and releases during branch cleanup. This fork is consumed through Git submodules and is not published on pub.dev.
+The upstream base is SoFluffyOS/xterm2 `2a339558ba103e38a304a4eda7c984b45c47e186` (5.3.0). `next` is this fork's default integration branch. `master` is an exact mirror of the upstream default branch; sync the fork into `master`, then separately review any integration into `next`. Both branches are permanent. Preserve tags and releases during branch cleanup. This fork is consumed through Git submodules and is not published on pub.dev.
 
 ## Retained upstream behavior
 
@@ -50,3 +50,7 @@ Legacy isolated combining marks are retained through `preserveOrphanCombiningMar
 Local Linux validation uses isolated Flutter 3.44.8 / Dart 3.12.2. The unmodified upstream suite passed 742 tests with two skips and two existing failures in `TerminalView.textScaler` goldens. After compatibility changes and regression additions, 851 non-golden tests passed with two skips. The same two golden failures remain; no golden images were regenerated to hide those differences.
 
 The two upstream golden tests are tagged `platform-golden`: CI gates all other tests and reports the golden job separately without making its known platform/SDK mismatch block compatibility changes. `flutter test` without filters still executes and reports them. Alera's migration report records application, platform and benchmark results separately.
+
+## Mirror automation
+
+The inherited `autotag.yml` workflow is disabled in GitHub Actions for this fork so updating the unmodified upstream `master` mirror cannot create tags. The `next` branch retains that workflow identity with a manual-only definition; ordinary pushes do not publish anything. Both permanent branches reject deletion, while mirror updates remain allowed.

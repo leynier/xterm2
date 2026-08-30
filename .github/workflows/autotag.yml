@@ -1,0 +1,15 @@
+name: Create Tag
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Keep the upstream workflow identity so it can remain disabled for mirror pushes.
+jobs:
+  disabled:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automatic tags are disabled in this fork."
