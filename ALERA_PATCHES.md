@@ -47,6 +47,8 @@ Legacy isolated combining marks are retained through `preserveOrphanCombiningMar
 
 ## Validation
 
+Native OSC 8 storage remains bounded at 4,096 entries. At capacity, full-buffer pruning is separated by 256 rejected allocation attempts, including when the previous scan reclaimed only one slot. Existing referenced links are retained; reclaiming erased links can be delayed by that bounded number of attempts. Reset clears the delay. `alera_hyperlink_capacity_test` covers retained links and eventual reclamation; `dart run script/hyperlink_capacity_benchmark.dart` measures repeated 1,000-link batches across capacity.
+
 Local Linux validation uses isolated Flutter 3.44.8 / Dart 3.12.2. The unmodified upstream suite passed 742 tests with two skips and two existing failures in `TerminalView.textScaler` goldens. After compatibility changes and regression additions, 851 non-golden tests passed with two skips. The same two golden failures remain; no golden images were regenerated to hide those differences.
 
 The two upstream golden tests are tagged `platform-golden`: CI gates all other tests and reports the golden job separately without making its known platform/SDK mismatch block compatibility changes. `flutter test` without filters still executes and reports them. Alera's migration report records application, platform and benchmark results separately.
