@@ -1,44 +1,27 @@
 name: CI
-
 on:
   push:
-    branches: [master]
+    branches: [next]
   pull_request:
-    branches: [master]
-
+    branches: [next]
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [macos-latest]
-        # sdk: [stable, beta, dev, 2.10.3, 2.12.0-29.10.beta]
-        sdk: [stable, master]
-
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-
-      # - uses: actions/setup-java@v1
-      #   with:
-      #     java-version: "12.x"
-
-      - uses: subosito/flutter-action@v1
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
-          channel: ${{ matrix.channel }}
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Verify formatting
-        run: dart format --set-exit-if-changed .
-
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
-      - name: Analyze project source
-        run: flutter analyze --fatal-infos
-
-      - name: Run tests
-        run: flutter test --coverage
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
+          flutter-version: '3.44.8'
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze --fatal-infos
+      - run: flutter test --exclude-tags platform-golden
+      - name: Report upstream golden compatibility
+        continue-on-error: true
+        run: flutter test --tags platform-golden

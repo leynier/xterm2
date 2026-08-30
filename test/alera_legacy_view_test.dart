@@ -125,6 +125,7 @@ void main() {
   ) async {
     final output = <String>[];
     final terminal = Terminal(onOutput: output.add)
+      ..setMouseShiftCaptureMode(true)
       ..write('selectable text')
       ..write('\x1b[?1003h\x1b[?1006h');
     final controller = TerminalController(pointerInputs: PointerInputs.all());
@@ -135,7 +136,8 @@ void main() {
           body: SizedBox(
             width: 400,
             height: 240,
-            child: TerminalView(terminal, controller: controller),
+            child: TerminalView(terminal,
+                controller: controller, shiftOverridesMouseReporting: true),
           ),
         ),
       ),

@@ -1,3 +1,7 @@
+# Alera xterm2 fork
+
+Alera consumes this fork as a submodule from `next`, its only permanent remote branch. It is based on SoFluffyOS/xterm2 at `2a339558ba103e38a304a4eda7c984b45c47e186`. See [ALERA_PATCHES.md](ALERA_PATCHES.md) for the compatibility audit and regression tests. This fork does not publish the upstream package name on pub.dev.
+
 
 ## xterm2
 

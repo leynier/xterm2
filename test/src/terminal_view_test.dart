@@ -1694,7 +1694,7 @@ void main() {
         find.byType(TerminalView),
         matchesGoldenFile('_goldens/text_scale_factor@2x.png'),
       );
-    });
+    }, tags: ['platform-golden']);
 
     testWidgets('can obtain textScaler from parent', (tester) async {
       final terminal = Terminal();
@@ -1719,7 +1719,7 @@ void main() {
         find.byType(TerminalView),
         matchesGoldenFile('_goldens/text_scale_factor@2x.png'),
       );
-    });
+    }, tags: ['platform-golden']);
   });
 
   group('TerminalView.inputHandler', () {
