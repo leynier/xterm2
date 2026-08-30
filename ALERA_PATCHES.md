@@ -31,7 +31,7 @@ Each row refers to `leynier/xterm.dart` history, not a cherry-pick into this rep
 | `cd7a998` restored pending wrap | Combined with upstream anchor-based reflow; preserve non-reflow saved coordinates | `alera_cursor_restore_test`, `src/terminal_test` |
 | `169de2f` mobile history reflow | Explicit opt-in remains true for restored mobile history | `alera_legacy_reflow_test` and Alera mobile terminal tests |
 | `ebfab96` trimmed row retention | Replaced by upstream trim release/index tracking | `alera_legacy_circular_test` |
-| `14ebe14` history/parser/painter memory | Compact history rows, regrow viewport rows and safely copy absent cells; retain upstream parser and painter optimizations | `alera_line_compact_test`, `alera_metadata_test` |
+| `14ebe14` history/parser/painter memory | Compact history rows, regrow viewport rows and safely copy absent cells; retain upstream parsing and bounded paragraph caching, with linked LRU updates and a plain ASCII cache fast path | `alera_line_compact_test`, `alera_metadata_test`, `src/ui/paragraph_cache_test`, Alera render benchmarks |
 | `d35ba2c` bright white | Replaced by upstream palette handling | upstream palette/render tests and Alera theme integration |
 
 Legacy isolated combining marks are retained through `preserveOrphanCombiningMarks: true` in Alera. Upstream's default behavior is unchanged. Graphemes attached to a preceding glyph remain upstream behavior.
@@ -47,6 +47,6 @@ Legacy isolated combining marks are retained through `preserveOrphanCombiningMar
 
 ## Validation
 
-Local Linux validation uses isolated Flutter 3.44.8 / Dart 3.12.2. The unmodified upstream suite passed 742 tests with two skips and two existing failures in `TerminalView.textScaler` goldens. After compatibility changes and regression additions, 850 tests passed with the same two skips and two golden failures. No golden images were regenerated to hide those differences.
+Local Linux validation uses isolated Flutter 3.44.8 / Dart 3.12.2. The unmodified upstream suite passed 742 tests with two skips and two existing failures in `TerminalView.textScaler` goldens. After compatibility changes and regression additions, 851 non-golden tests passed with two skips. The same two golden failures remain; no golden images were regenerated to hide those differences.
 
 The two upstream golden tests are tagged `platform-golden`: CI gates all other tests and reports the golden job separately without making its known platform/SDK mismatch block compatibility changes. `flutter test` without filters still executes and reports them. Alera's migration report records application, platform and benchmark results separately.
