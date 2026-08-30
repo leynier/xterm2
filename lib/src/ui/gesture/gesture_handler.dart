@@ -101,7 +101,9 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
       onPointerCancel: _onPointerCancel,
       child: TerminalGestureDetector(
         child: widget.child,
-        onTapUp: widget.onTapUp,
+        onTapUp: (details) {
+          if (!_applicationHandlesTap) widget.onTapUp?.call(details);
+        },
         onSingleTapUp: onSingleTapUp,
         onRepeatedTapUp: onSingleTapUp,
         onTapDown: onTapDown,
@@ -310,7 +312,8 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
 
   bool get _bypassesMouseReportingWithShift {
     if (!_isShiftPressed) return false;
-    return !widget.terminalView.widget.terminal.mouseShiftCaptureMode;
+    return widget.terminalView.widget.shiftOverridesMouseReporting ||
+        !widget.terminalView.widget.terminal.mouseShiftCaptureMode;
   }
 
   void onTapDown(TapDownDetails details) {

@@ -125,9 +125,24 @@ class TerminalView extends StatefulWidget {
     this.readOnly = false,
     this.hardwareKeyboardOnly = false,
     this.simulateScroll = true,
+    this.mouseWheelSensitivity = 1,
+    this.shiftOverridesMouseReporting = false,
+    this.onPaste,
+    this.onCopy,
+    this.cursorBlink,
   });
 
   /// The underlying terminal that this widget renders.
+  final int mouseWheelSensitivity;
+
+  /// Keep Shift available for local selection even when a TUI requests capture.
+  final bool shiftOverridesMouseReporting;
+  final Future<void> Function()? onPaste;
+  final Future<void> Function(String text)? onCopy;
+
+  /// Null follows the application-selected cursor blinking mode.
+  final bool? cursorBlink;
+
   final Terminal terminal;
 
   final TerminalController? controller;
@@ -447,6 +462,7 @@ class TerminalViewState extends State<TerminalView> {
           theme: widget.theme,
           focusNode: _focusNode,
           cursorType: widget.cursorType,
+          cursorBlink: widget.cursorBlink,
           alwaysShowCursor: widget.alwaysShowCursor,
           activeHyperlinkId: _activeHyperlinkId,
           onEditableRect: _onEditableRect,
@@ -459,6 +475,8 @@ class TerminalViewState extends State<TerminalView> {
       terminal: widget.terminal,
       terminalController: _controller,
       simulateScroll: widget.simulateScroll,
+      mouseWheelSensitivity: widget.mouseWheelSensitivity,
+      shiftOverridesMouseReporting: widget.shiftOverridesMouseReporting,
       readOnly: widget.readOnly,
       sendMouseEvent: (button, state, offset, {required modifiers}) {
         return renderTerminal.mouseEvent(
@@ -513,6 +531,8 @@ class TerminalViewState extends State<TerminalView> {
     }
 
     child = TerminalActions(
+      onPaste: widget.onPaste,
+      onCopy: widget.onCopy,
       terminal: widget.terminal,
       controller: _controller,
       getScrollPosition: () => _scrollableKey.currentState?.position,
@@ -688,6 +708,10 @@ class TerminalViewState extends State<TerminalView> {
       return resultOverride;
     }
 
+    if (_shouldCopySelectionWithControlC(event)) {
+      Actions.invoke(focusNode.context!, CopySelectionTextIntent.copy);
+      return KeyEventResult.handled;
+    }
     final context = focusNode.context;
     if (context == null) {
       return KeyEventResult.ignored;
@@ -838,6 +862,22 @@ class TerminalViewState extends State<TerminalView> {
     return keyLabel;
   }
 
+  bool _shouldCopySelectionWithControlC(KeyEvent event) {
+    if (event is! KeyDownEvent ||
+        _controller.selectionFor(widget.terminal.buffer) == null) {
+      return false;
+    }
+    if (defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      return false;
+    }
+    return event.logicalKey == LogicalKeyboardKey.keyC &&
+        HardwareKeyboard.instance.isControlPressed &&
+        !HardwareKeyboard.instance.isShiftPressed &&
+        !HardwareKeyboard.instance.isAltPressed &&
+        !HardwareKeyboard.instance.isMetaPressed;
+  }
+
   void _onKeyboardShow() {
     if (_focusNode.hasFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -872,6 +912,7 @@ class _TerminalView extends LeafRenderObjectWidget {
     required this.theme,
     required this.focusNode,
     required this.cursorType,
+    this.cursorBlink,
     required this.alwaysShowCursor,
     this.activeHyperlinkId,
     this.onEditableRect,
@@ -900,6 +941,8 @@ class _TerminalView extends LeafRenderObjectWidget {
 
   final TerminalCursorType cursorType;
 
+  final bool? cursorBlink;
+
   final bool alwaysShowCursor;
 
   final int? activeHyperlinkId;
@@ -922,6 +965,7 @@ class _TerminalView extends LeafRenderObjectWidget {
       theme: theme,
       focusNode: focusNode,
       cursorType: cursorType,
+      cursorBlink: cursorBlink,
       alwaysShowCursor: alwaysShowCursor,
       activeHyperlinkId: activeHyperlinkId,
       onEditableRect: onEditableRect,
@@ -943,6 +987,7 @@ class _TerminalView extends LeafRenderObjectWidget {
       ..theme = theme
       ..focusNode = focusNode
       ..cursorType = cursorType
+      ..cursorBlink = cursorBlink
       ..alwaysShowCursor = alwaysShowCursor
       ..activeHyperlinkId = activeHyperlinkId
       ..onEditableRect = onEditableRect
