@@ -41,8 +41,8 @@ Legacy isolated combining marks are retained through `preserveOrphanCombiningMar
 - `TerminalView.onPaste` and `onCopy` keep the embedding application's clipboard and image-paste policy. `mouseWheelSensitivity`, `TerminalStyle.fontWeight` and nullable `cursorBlink` preserve configurable presentation and interaction.
 - `shiftOverridesMouseReporting: true` keeps Shift available for local selection even when the terminal application requests Shift capture.
 - `clipboardTerminalShortcuts` retains the original clipboard/select-all bindings without enabling xterm2's navigation shortcuts.
-- `Terminal.clipboardDecoder` receives the original OSC 52 selector and encoded payload before native normalization. Alera retains its 128 KiB encoded-payload limit and explicit-selector policy, and gates the decoded callback behind its existing permission.
-- Alera sets `allowITerm2ClipboardCapture: false` and leaves `onClipboardQuery` unset. No additional clipboard read or write protocol is enabled.
+- `Terminal.clipboardDecoder` receives the original OSC 52 selector and encoded payload before native normalization. The parser permits 128 KiB encoded clipboard payloads after a bounded header, keeps the 8 KiB limit for other OSC sequences, and rejects trailing OSC 52 fields. Alera gates the decoded callback behind its existing permission. `alera_clipboard_parser_test` covers the payload boundary and recovery after oversized split sequences.
+- Alera sets `allowITerm2ClipboardCapture: false` and `allowKittyClipboard: false`. It supplies an explicit `onClipboardQuery` callback returning null, because an unset callback lets `TerminalView` install its system clipboard reader. Mobile also supplies a no-op store callback. No additional clipboard read or write protocol is enabled; focused-view regressions live in Alera's desktop/mobile suites.
 - Embedders must call `Terminal.dispose()` when closing or replacing an emulator to cancel synchronized-update timers and release its resources.
 
 ## Validation
