@@ -130,7 +130,7 @@ class TerminalView extends StatefulWidget {
     this.onPaste,
     this.onCopy,
     this.cursorBlink,
-    this.applicationScrollWhenCursorHidden = false,
+    this.touchScrollLinesPerWheelEvent = 1,
   });
 
   /// The underlying terminal that this widget renders.
@@ -241,11 +241,15 @@ class TerminalView extends StatefulWidget {
   /// scrolling, the terminal will simulate scrolling by sending up/down arrow
   /// keys to the application. This is standard behavior for most terminal
   /// emulators. True by default.
+  ///
+  /// Scroll routing does not depend on [readOnly]: an application that owns
+  /// its scroll (alternate screen or mouse reporting) still receives wheel
+  /// reports, or these simulated keys, from a read-only view.
   final bool simulateScroll;
 
-  /// Treat a hidden cursor as a full-screen application for scroll routing,
-  /// including when [readOnly] is true. Off by default.
-  final bool applicationScrollWhenCursorHidden;
+  /// Lines of finger travel that produce one wheel report when the
+  /// application owns scrolling. 1 by default, which matches a mouse notch.
+  final int touchScrollLinesPerWheelEvent;
 
   @override
   State<TerminalView> createState() => TerminalViewState();
@@ -482,9 +486,7 @@ class TerminalViewState extends State<TerminalView> {
       simulateScroll: widget.simulateScroll,
       mouseWheelSensitivity: widget.mouseWheelSensitivity,
       shiftOverridesMouseReporting: widget.shiftOverridesMouseReporting,
-      readOnly: widget.readOnly,
-      applicationScrollWhenCursorHidden:
-          widget.applicationScrollWhenCursorHidden,
+      touchScrollLinesPerWheelEvent: widget.touchScrollLinesPerWheelEvent,
       sendMouseEvent: (button, state, offset, {required modifiers}) {
         return renderTerminal.mouseEvent(
           button,
@@ -554,12 +556,10 @@ class TerminalViewState extends State<TerminalView> {
       terminalController: _controller,
       onTapUp: _onTapUp,
       onTapDown: _onTapDown,
-      onSecondaryTapDown: widget.onSecondaryTapDown != null
-          ? _onSecondaryTapDown
-          : null,
-      onSecondaryTapUp: widget.onSecondaryTapUp != null
-          ? _onSecondaryTapUp
-          : null,
+      onSecondaryTapDown:
+          widget.onSecondaryTapDown != null ? _onSecondaryTapDown : null,
+      onSecondaryTapUp:
+          widget.onSecondaryTapUp != null ? _onSecondaryTapUp : null,
       readOnly: widget.readOnly,
       child: child,
     );
@@ -840,16 +840,14 @@ class TerminalViewState extends State<TerminalView> {
     }
 
     if (HardwareKeyboard.instance.isShiftPressed) {
-      final shifted =
-          _shiftedPrintablePhysicalFallbacks[event.physicalKey] ??
+      final shifted = _shiftedPrintablePhysicalFallbacks[event.physicalKey] ??
           _shiftedPrintableLogicalFallbacks[event.logicalKey];
       if (shifted != null) {
         return shifted;
       }
     }
 
-    final fallback =
-        _printablePhysicalFallbacks[event.physicalKey] ??
+    final fallback = _printablePhysicalFallbacks[event.physicalKey] ??
         _printableLogicalFallbacks[event.logicalKey];
     if (fallback != null) {
       return fallback;
