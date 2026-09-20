@@ -53,6 +53,12 @@ Local Linux validation uses isolated Flutter 3.44.8 / Dart 3.12.2. The unmodifie
 
 The two upstream golden tests are tagged `platform-golden`: CI gates all other tests and reports the golden job separately without making its known platform/SDK mismatch block compatibility changes. `flutter test` without filters still executes and reports them. Alera's migration report records application, platform and benchmark results separately.
 
+## Next-branch fixes
+
+| Fix | Disposition | Regression evidence |
+| --- | --- | --- |
+| Kitty private-use keys | Report modifier, lock, F13-F24, media, and numpad Kitty codes only with flag 8 (`report all keys`). Flag 1 (Cursor CLI `CSI > 1 u`) must not emit `CSI 57358+ u`; Ink inserts those codepoints as prompt text. Releases without flag 2 stay silent. | `src/core/input/handler_test`, `src/terminal_view_test`, `src/ui/kitty_modifier_key_filter_test` |
+
 ## Mirror automation
 
 The inherited `autotag.yml` workflow is disabled in GitHub Actions for this fork so updating the unmodified upstream `master` mirror cannot create tags. The `next` branch retains that workflow identity with a manual-only definition; ordinary pushes do not publish anything. Both permanent branches reject deletion, while mirror updates remain allowed.
