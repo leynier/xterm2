@@ -127,6 +127,7 @@ class TerminalView extends StatefulWidget {
     this.simulateScroll = true,
     this.mouseWheelSensitivity = 1,
     this.shiftOverridesMouseReporting = false,
+    this.dragOverridesMouseReporting = false,
     this.onPaste,
     this.onCopy,
     this.cursorBlink,
@@ -138,6 +139,12 @@ class TerminalView extends StatefulWidget {
 
   /// Keep Shift available for local selection even when a TUI requests capture.
   final bool shiftOverridesMouseReporting;
+
+  /// Keep a primary-button drag as local selection even when a TUI requests
+  /// capture. Clicks and wheel input still reach the application; a press
+  /// that turns into a drag is never reported, and a press that does not is
+  /// reported as a click on release.
+  final bool dragOverridesMouseReporting;
   final Future<void> Function()? onPaste;
   final Future<void> Function(String text)? onCopy;
 
